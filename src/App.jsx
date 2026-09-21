@@ -139,7 +139,7 @@ function Home({ go }) {
 
     <BusinessNetworkSection go={go} />
 
-    <section className="section journey container"><SectionHeading kicker="THE SODHI JOURNEY" title="From request to received." text="A simple sequence, with a person to reach at every important step." /><div className="journey-line">{[['01', 'Enquire', 'Share the route and service'], ['02', 'Confirm', 'Review the right option'], ['03', 'Handover', 'Pickup or desk processing'], ['04', 'Complete', 'Receive the final update']].map(([num, title, text]) => <div className="journey-step reveal" key={num}><span>{num}</span><strong>{title}</strong><small>{text}</small></div>)}</div></section>
+    <section className="section journey container"><SectionHeading kicker="THE SODHI JOURNEY" title="From request to received." text="A simple sequence, with a person to reach at every important step." /><JourneyMotionScene /><div className="journey-line">{[['01', 'Enquire', 'Share the route and service'], ['02', 'Confirm', 'Review the right option'], ['03', 'Handover', 'Pickup or desk processing'], ['04', 'Complete', 'Receive the final update']].map(([num, title, text]) => <div className="journey-step reveal" key={num}><span>{num}</span><strong>{title}</strong><small>{text}</small></div>)}</div></section>
 
     <section className="operations"><div className="container operations-grid"><div className="operations-copy reveal"><p className="section-kicker">BEHIND EVERY REQUEST</p><h2>Practical support, from first detail to final handoff.</h2><p>One coordinated desk helps keep courier movement and document tasks organised, without chasing multiple channels.</p><button className="button button-primary" onClick={() => go('services')}>Explore services <ArrowRight size={18} /></button><div className="operations-points"><span><Headphones size={20} /> Direct support</span><span><ShieldCheck size={20} /> Clear handoffs</span></div></div><div className="operations-photo reveal"><img src="https://images.unsplash.com/photo-1586528116493-a029325540fa?auto=format&fit=crop&w=1600&q=85" alt="Modern logistics facility with parcels ready to move" /><div><strong>One connected service desk</strong><span>Courier • Documents • Business</span></div></div></div></section>
 
@@ -325,6 +325,137 @@ function HeroObjectScene() {
     <div className="object-label object-label-top"><span /> Live movement</div>
     <div className="object-label object-label-bottom"><strong>3D logistics flow</strong><small>Subtle cargo movement through the desk</small></div>
     <div className="object-stat"><span>Live</span><small>dispatch view</small></div>
+  </div>
+}
+
+function JourneyMotionScene() {
+  const mountRef = useRef(null)
+  useEffect(() => {
+    const mount = mountRef.current
+    if (!mount) return undefined
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50)
+    camera.position.set(0, 4.8, 9.7)
+    camera.lookAt(0, 0, 0)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6))
+    renderer.setClearColor(0x000000, 0)
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    mount.appendChild(renderer.domElement)
+
+    scene.add(new THREE.HemisphereLight(0xf8fbff, 0xb8c9da, 2.3))
+    const key = new THREE.DirectionalLight(0xffffff, 3.4)
+    key.position.set(-3, 7, 6)
+    key.castShadow = true
+    scene.add(key)
+    const accent = new THREE.PointLight(0xff6b27, 34, 10)
+    accent.position.set(0, 2.2, 2.5)
+    scene.add(accent)
+
+    const world = new THREE.Group()
+    world.rotation.x = -0.12
+    scene.add(world)
+    const navy = new THREE.MeshStandardMaterial({ color: 0x123c63, roughness: 0.32, metalness: 0.5 })
+    const orange = new THREE.MeshStandardMaterial({ color: 0xf56b25, emissive: 0x3a1102, roughness: 0.27, metalness: 0.22 })
+    const silver = new THREE.MeshStandardMaterial({ color: 0xe8f0f7, roughness: 0.3, metalness: 0.42 })
+
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(7.5, 0.13, 0.34), navy)
+    rail.position.y = -0.18
+    rail.castShadow = true
+    rail.receiveShadow = true
+    world.add(rail)
+
+    const nodePositions = [-3.35, -1.12, 1.12, 3.35]
+    const rings = nodePositions.map((x, index) => {
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.52, 0.18, 40), silver)
+      base.position.set(x, -0.02, 0)
+      base.castShadow = true
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.035, 10, 48), index === 3 ? orange : navy)
+      ring.rotation.x = Math.PI / 2
+      ring.position.set(x, 0.13, 0)
+      world.add(base, ring)
+      return ring
+    })
+
+    const parcel = new THREE.Group()
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.58, 0.62), orange)
+    box.castShadow = true
+    const tape = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.596, 0.635), silver)
+    const label = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.012), new THREE.MeshBasicMaterial({ color: 0xffffff }))
+    label.position.set(0.16, 0.05, 0.318)
+    parcel.add(box, tape, label)
+    parcel.position.set(-3.35, 0.62, 0)
+    world.add(parcel)
+
+    const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.48, 40), new THREE.MeshBasicMaterial({ color: 0x173d62, transparent: true, opacity: 0.16, depthWrite: false }))
+    shadow.rotation.x = -Math.PI / 2
+    shadow.position.y = 0.02
+    world.add(shadow)
+
+    const pointer = { x: 0, y: 0 }
+    const onPointerMove = event => {
+      const rect = mount.getBoundingClientRect()
+      pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
+      pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
+    }
+    mount.addEventListener('pointermove', onPointerMove)
+
+    const resize = () => {
+      const width = mount.clientWidth
+      const height = mount.clientHeight
+      renderer.setSize(width, height, false)
+      camera.aspect = width / Math.max(height, 1)
+      camera.updateProjectionMatrix()
+    }
+    resize()
+    const resizeObserver = new ResizeObserver(resize)
+    resizeObserver.observe(mount)
+
+    let frame
+    const clock = new THREE.Clock()
+    const render = () => {
+      const t = reducedMotion ? 1.2 : clock.getElapsedTime()
+      const travel = (Math.sin(t * 0.56 - Math.PI / 2) + 1) / 2
+      parcel.position.x = -3.35 + travel * 6.7
+      parcel.position.y = 0.58 + Math.sin(t * 3.2) * 0.045
+      parcel.rotation.y = Math.sin(t * 0.8) * 0.08
+      shadow.position.x = parcel.position.x
+      rings.forEach((ring, index) => {
+        const proximity = Math.max(0, 1 - Math.abs(parcel.position.x - nodePositions[index]) / 1.15)
+        const scale = 1 + proximity * 0.28
+        ring.scale.setScalar(scale)
+        ring.rotation.z = t * (index % 2 ? -0.35 : 0.35)
+      })
+      world.rotation.y += ((reducedMotion ? 0 : pointer.x * 0.055) - world.rotation.y) * 0.04
+      world.rotation.x += ((reducedMotion ? -0.12 : -0.12 - pointer.y * 0.035) - world.rotation.x) * 0.04
+      renderer.render(scene, camera)
+      frame = requestAnimationFrame(render)
+    }
+    render()
+
+    return () => {
+      cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+      mount.removeEventListener('pointermove', onPointerMove)
+      scene.traverse(item => {
+        if (item.geometry) item.geometry.dispose()
+        if (item.material) {
+          const materials = Array.isArray(item.material) ? item.material : [item.material]
+          materials.forEach(material => material.dispose())
+        }
+      })
+      renderer.dispose()
+      renderer.domElement.remove()
+    }
+  }, [])
+
+  return <div className="journey-motion reveal" aria-label="Animated parcel moving through four delivery stages">
+    <div className="journey-motion-stage" ref={mountRef} aria-hidden="true" />
+    <span className="journey-live"><i /> ROUTE IN MOTION</span>
+    <span className="journey-status">Desk coordinated <strong>01 → 04</strong></span>
   </div>
 }
 
