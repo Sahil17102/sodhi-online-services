@@ -275,11 +275,13 @@ input::placeholder,textarea::placeholder{color:#a1afbd}
 .page-motion-scene:after{content:"";position:absolute;left:50%;bottom:24px;width:340px;height:72px;border-radius:50%;background:radial-gradient(ellipse,rgba(12,43,83,.19),rgba(12,43,83,0) 70%);filter:blur(4px);transform:translateX(-50%);pointer-events:none}
 .page-motion-scene>div:first-child{position:absolute;inset:0}
 .page-motion-scene canvas{width:100%!important;height:100%!important;display:block}
-.motion-card-copy{position:absolute!important;left:50%;top:50%;width:235px;height:180px;display:grid;place-items:center;align-content:center;gap:12px;text-align:center;transform:translate(-50%,-50%) rotate(-.5deg);color:white;pointer-events:none;z-index:3}
-.motion-card-copy span{color:#92a9c8;font-size:11px;letter-spacing:2.5px;font-weight:850}
-.motion-card-copy strong{font-size:clamp(34px,3vw,50px);line-height:1;color:white;font-weight:900}
-.motion-card-copy small{font-size:13px;color:#afc0d7}
-.motion-chip{position:absolute;z-index:4;background:rgba(255,255,255,.94);border:1px solid #dfe8f2;box-shadow:0 18px 42px rgba(21,58,97,.1);border-radius:13px;padding:16px 21px;color:#17304a;font-size:14px;font-weight:850;animation:chipFloat 5s ease-in-out infinite}
+.motion-card-copy{position:absolute!important;left:50%;top:50%;width:250px;height:190px;display:grid;place-items:center;align-content:center;gap:12px;text-align:center;transform:translate(-50%,-50%);color:white;pointer-events:none;z-index:5;overflow:hidden;border:1px solid rgba(160,195,231,.34);border-radius:16px;background:linear-gradient(145deg,rgba(17,55,91,.98),rgba(7,32,57,.98));box-shadow:0 28px 55px rgba(9,37,65,.28),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(16px)}
+.motion-card-copy:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.09),transparent 34%,transparent 70%,rgba(45,111,210,.08));pointer-events:none}
+.motion-card-copy span,.motion-card-copy strong,.motion-card-copy small{position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.2)}
+.motion-card-copy span{color:#b9cee5;font-size:11px;letter-spacing:2.5px;font-weight:850}
+.motion-card-copy strong{font-size:clamp(34px,3vw,50px);line-height:1;color:#fff;font-weight:900}
+.motion-card-copy small{font-size:13px;color:#d4e1ee;font-weight:650}
+.motion-chip{position:absolute;z-index:6;background:rgba(255,255,255,.96);border:1px solid #d7e3ef;box-shadow:0 18px 42px rgba(21,58,97,.12);border-radius:13px;padding:16px 21px;color:#17304a;font-size:14px;font-weight:850;animation:chipFloat 5s ease-in-out infinite}
 .chip-top{left:10%;top:20%;animation-delay:-1.2s}
 .chip-right{right:7%;top:32%;animation-delay:-2.2s}
 .chip-bottom{right:17%;bottom:18%;animation-delay:-.4s}
