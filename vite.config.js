@@ -4,4 +4,10 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  preview: {
+    allowedHosts: [
+      'sodhi-online-services.onrender.com',
+      'sodhi-online-services-1.onrender.com',
+    ],
+  },
 })
